@@ -23,7 +23,7 @@ const Index = () => {
               Demo portfolio for Prof. Margaret-Anne Storey
             </p>
             <p className="text-sm text-muted-foreground">
-              Built with <a href="https://lovable.ai" className="text-primary hover:underline">Lovable</a>
+              Built with <a href="https://lovable.dev" className="text-primary hover:underline">Lovable</a>
             </p>
           </div>
         </footer>
