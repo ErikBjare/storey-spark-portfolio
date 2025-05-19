@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, InfoIcon } from "lucide-react";
+import { ChevronDown, InfoIcon, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   ChartContainer,
@@ -355,11 +355,25 @@ const SpaceFramework = () => {
             <CardContent>
               {analysisTab === 'insights' && (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {selectedDimension !== null ? 
-                      `Insights for ${dimensions[selectedDimension].fullName}:` : 
-                      "Select a dimension by clicking on a slider to see specific insights."}
-                  </p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {selectedDimension !== null ? 
+                        `Insights for ${dimensions[selectedDimension].fullName}:` : 
+                        "Select a dimension by clicking on a slider to see specific insights."}
+                    </p>
+                    {selectedDimension !== null && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedDimension(null)}
+                        className="flex items-center gap-1"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to overview
+                      </Button>
+                    )}
+                  </div>
+                  
                   {selectedDimension !== null ? (
                     <div className="p-4 border rounded-md bg-background">
                       <h4 className="font-semibold mb-2">{dimensions[selectedDimension].fullName}</h4>
@@ -405,11 +419,25 @@ const SpaceFramework = () => {
 
               {analysisTab === 'recommendations' && (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {selectedDimension !== null ? 
-                      `Recommendations for ${dimensions[selectedDimension].fullName}:` : 
-                      "Select a dimension by clicking on a slider to see specific recommendations."}
-                  </p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {selectedDimension !== null ? 
+                        `Recommendations for ${dimensions[selectedDimension].fullName}:` : 
+                        "Select a dimension by clicking on a slider to see specific recommendations."}
+                    </p>
+                    {selectedDimension !== null && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setSelectedDimension(null)}
+                        className="flex items-center gap-1"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to overview
+                      </Button>
+                    )}
+                  </div>
+                  
                   {selectedDimension !== null ? (
                     <div className="p-4 border rounded-md bg-background">
                       <h4 className="font-semibold mb-2">{dimensions[selectedDimension].fullName}</h4>
