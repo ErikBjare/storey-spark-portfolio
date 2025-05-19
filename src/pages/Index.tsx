@@ -20,10 +20,10 @@ const Index = () => {
         <footer className="border-t py-6 md:py-0">
           <div className="container flex flex-col md:flex-row items-center justify-between gap-4 md:h-24">
             <p className="text-sm text-muted-foreground">
-              © 2023 Prof. Margaret-Anne Storey. All rights reserved.
+              Demo portfolio for Prof. Margaret-Anne Storey
             </p>
             <p className="text-sm text-muted-foreground">
-              Interactive Portfolio
+              Built with <a href="https://lovable.ai" className="text-primary hover:underline">Lovable</a>
             </p>
           </div>
         </footer>
