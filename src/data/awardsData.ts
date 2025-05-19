@@ -72,5 +72,13 @@ export const awardsData: Award[] = [
     year: 2021,
     description: "Received funding for innovative research on developer experience and productivity measurement.",
     category: 'industry'
+  },
+  {
+    id: 9,
+    title: "Honorary Doctorate (Hedersdoktor)",
+    organization: "Lund University Faculty of Engineering (LTH)",
+    year: 2024,
+    description: "Awarded honorary doctorate for pioneering research in human and social aspects of software engineering and significant contributions to establishing software research with a design science perspective at LTH.",
+    category: 'research'
   }
 ];

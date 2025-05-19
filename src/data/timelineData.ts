@@ -77,5 +77,12 @@ export const timelineData: TimelineEvent[] = [
     title: "Published work on AI and Developer Productivity",
     description: "Research on the impact of AI tools on software developer productivity",
     category: 'publication'
+  },
+  {
+    id: 11,
+    year: 2024,
+    title: "Honorary Doctorate from Lund University",
+    description: "Awarded honorary doctorate (hedersdoktor) from Lund University Faculty of Engineering (LTH) for pioneering research in software engineering",
+    category: 'award'
   }
 ];
