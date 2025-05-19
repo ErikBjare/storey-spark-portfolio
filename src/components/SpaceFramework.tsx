@@ -1,17 +1,40 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from "recharts";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, InfoIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { 
+  ChartContainer,
+  ChartLegend,
+  ChartTooltip,
+  ChartTooltipContent
+} from "@/components/ui/chart";
 
 interface SpaceDimension {
   dimension: string;
   fullName: string;
   value: number;
   description: string;
+  insights: {
+    low: string;
+    medium: string;
+    high: string;
+  };
+  recommendations: {
+    low: string;
+    medium: string;
+    high: string;
+  };
+}
+
+interface DimensionalBalance {
+  label: string;
+  description: string;
+  recommendations: string;
 }
 
 const SpaceFramework = () => {
@@ -20,35 +43,87 @@ const SpaceFramework = () => {
       dimension: "Satisfaction",
       fullName: "Satisfaction & Well-being",
       value: 70,
-      description: "Developer satisfaction, happiness, and health"
+      description: "Developer satisfaction, happiness, and health",
+      insights: {
+        low: "Low satisfaction often leads to burnout, high turnover, and reduced engagement.",
+        medium: "Moderate satisfaction indicates basic needs are met but there's room for improvement.",
+        high: "High satisfaction correlates with better retention, creativity, and intrinsic motivation."
+      },
+      recommendations: {
+        low: "Focus on work-life balance, recognize achievements, and gather feedback on pain points.",
+        medium: "Implement targeted improvements based on developer feedback and provide growth opportunities.",
+        high: "Maintain the positive environment while finding ways to share successful practices with other teams."
+      }
     },
     {
       dimension: "Performance",
       fullName: "Performance",
       value: 80,
-      description: "Outcome of work against goals and expectations"
+      description: "Outcome of work against goals and expectations",
+      insights: {
+        low: "Low performance suggests misaligned goals, insufficient resources, or capability gaps.",
+        medium: "Adequate performance indicates basic expectations are met but optimization is possible.",
+        high: "High performance shows effective goal-setting, resource allocation, and capability utilization."
+      },
+      recommendations: {
+        low: "Clarify expectations, provide targeted training, and remove organizational obstacles.",
+        medium: "Fine-tune goal-setting processes and identify specific optimization opportunities.",
+        high: "Share best practices, explore innovation opportunities, and consider raising the bar."
+      }
     },
     {
       dimension: "Activity",
       fullName: "Activity",
       value: 75,
-      description: "Actions and tasks performed while working"
+      description: "Actions and tasks performed while working",
+      insights: {
+        low: "Low activity metrics may indicate process obstacles, distractions, or unclear priorities.",
+        medium: "Medium activity levels show adequate engagement but potential for more focused work.",
+        high: "High activity suggests strong engagement, but check that it translates to outcomes."
+      },
+      recommendations: {
+        low: "Identify and remove process blockers, clarify priorities, and minimize distractions.",
+        medium: "Optimize workflows, reduce context-switching, and focus on highest-value activities.",
+        high: "Ensure high activity translates to meaningful outcomes rather than just busyness."
+      }
     },
     {
       dimension: "Communication",
       fullName: "Communication & Collaboration",
       value: 65,
-      description: "How people and teams work together"
+      description: "How people and teams work together",
+      insights: {
+        low: "Poor communication creates silos, misunderstandings, and duplicated efforts.",
+        medium: "Adequate communication enables basic coordination but may lack richness.",
+        high: "Strong communication networks foster knowledge sharing, innovation, and alignment."
+      },
+      recommendations: {
+        low: "Establish clear communication channels and regular sync points between teams.",
+        medium: "Enhance knowledge sharing platforms and develop more cross-team collaborations.",
+        high: "Focus on maintaining efficient communication while avoiding meeting overload."
+      }
     },
     {
       dimension: "Efficiency",
       fullName: "Efficiency & Flow",
       value: 60,
-      description: "Work without delays or interruptions"
+      description: "Work without delays or interruptions",
+      insights: {
+        low: "Low efficiency indicates frequent context switching, interruptions, or process friction.",
+        medium: "Moderate efficiency suggests some flow states are achieved but inconsistently.",
+        high: "High efficiency demonstrates effective systems that protect focus time and flow."
+      },
+      recommendations: {
+        low: "Implement no-meeting days, reduce interruptions, and streamline approval processes.",
+        medium: "Optimize workflows, automate routine tasks, and create more space for deep work.",
+        high: "Fine-tune existing systems and help other teams adopt successful practices."
+      }
     }
   ]);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [analysisTab, setAnalysisTab] = useState<'insights' | 'recommendations' | 'balance'>('insights');
+  const [selectedDimension, setSelectedDimension] = useState<number | null>(null);
 
   const handleSliderChange = (index: number, newValue: number[]) => {
     const updatedDimensions = [...dimensions];
@@ -61,6 +136,73 @@ const SpaceFramework = () => {
     value: item.value,
     fullMark: 100
   }));
+
+  const getDimensionLevel = (value: number): 'low' | 'medium' | 'high' => {
+    if (value < 40) return 'low';
+    if (value < 70) return 'medium';
+    return 'high';
+  };
+
+  const dimensionalBalance = useMemo((): DimensionalBalance[] => {
+    const results: DimensionalBalance[] = [];
+
+    // Check for high satisfaction but low efficiency
+    if (dimensions[0].value > 70 && dimensions[4].value < 40) {
+      results.push({
+        label: "High Satisfaction, Low Efficiency",
+        description: "Teams may be comfortable but not optimizing their processes.",
+        recommendations: "Look for process improvements without disrupting team culture."
+      });
+    }
+    
+    // Check for high performance but low satisfaction
+    if (dimensions[1].value > 70 && dimensions[0].value < 40) {
+      results.push({
+        label: "High Performance, Low Satisfaction",
+        description: "Productivity at the expense of developer well-being - risk of burnout.",
+        recommendations: "Urgent need to address well-being concerns to sustain performance long-term."
+      });
+    }
+
+    // Check for high activity but low performance
+    if (dimensions[2].value > 70 && dimensions[1].value < 40) {
+      results.push({
+        label: "High Activity, Low Performance",
+        description: "Busy work that doesn't translate to meaningful outcomes.",
+        recommendations: "Refocus on value-generating activities and clear goal alignment."
+      });
+    }
+
+    // Check for balanced profile
+    const values = dimensions.map(d => d.value);
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    const maxDeviation = Math.max(...values.map(v => Math.abs(v - avg)));
+    
+    if (maxDeviation < 15) {
+      results.push({
+        label: "Balanced Profile",
+        description: "All dimensions are relatively aligned, suggesting a holistic approach.",
+        recommendations: avg > 70 
+          ? "Maintain this balanced excellence across all dimensions."
+          : "Consider proportional improvements across all dimensions."
+      });
+    }
+
+    // Check for communication imbalance
+    if (dimensions[3].value < 40 && (dimensions[1].value > 60 || dimensions[2].value > 60)) {
+      results.push({
+        label: "Communication Deficiency",
+        description: "Activity or performance happening in silos with poor collaboration.",
+        recommendations: "Strengthen cross-team communication channels and knowledge sharing."
+      });
+    }
+
+    return results.length > 0 ? results : [{
+      label: "Custom Analysis",
+      description: "Adjust the sliders to see how changes in each dimension affect the overall developer experience.",
+      recommendations: "Try creating different profiles to understand various team dynamics."
+    }];
+  }, [dimensions]);
 
   return (
     <section id="space" className="py-16">
@@ -134,6 +276,7 @@ const SpaceFramework = () => {
                         max={100}
                         step={5}
                         onValueChange={(newValue) => handleSliderChange(index, newValue)}
+                        onValueCommit={() => setSelectedDimension(index)}
                       />
                     </div>
                   ))}
@@ -142,7 +285,13 @@ const SpaceFramework = () => {
             </Card>
           </div>
           <div className="h-[400px] bg-card rounded-lg p-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartContainer
+              config={{
+                space: { 
+                  color: "hsl(var(--primary))"
+                }
+              }}
+            >
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                 <PolarGrid />
                 <PolarAngleAxis dataKey="dimension" />
@@ -154,9 +303,157 @@ const SpaceFramework = () => {
                   fill="hsl(var(--primary))"
                   fillOpacity={0.3}
                 />
+                <ChartTooltip content={<ChartTooltipContent />} />
               </RadarChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </div>
+        </div>
+
+        <div className="mt-10">
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle>Framework Analysis</CardTitle>
+              <CardDescription>
+                Insights based on your current dimension settings
+              </CardDescription>
+              <div className="flex space-x-1 rounded-lg bg-muted p-1 text-muted-foreground mt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "flex-1 text-sm",
+                    analysisTab === 'insights' && "bg-background text-foreground shadow"
+                  )}
+                  onClick={() => setAnalysisTab('insights')}
+                >
+                  Dimension Insights
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "flex-1 text-sm",
+                    analysisTab === 'recommendations' && "bg-background text-foreground shadow"
+                  )}
+                  onClick={() => setAnalysisTab('recommendations')}
+                >
+                  Recommendations
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "flex-1 text-sm",
+                    analysisTab === 'balance' && "bg-background text-foreground shadow"
+                  )}
+                  onClick={() => setAnalysisTab('balance')}
+                >
+                  Balance Analysis
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {analysisTab === 'insights' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {selectedDimension !== null ? 
+                      `Insights for ${dimensions[selectedDimension].fullName}:` : 
+                      "Select a dimension by clicking on a slider to see specific insights."}
+                  </p>
+                  {selectedDimension !== null ? (
+                    <div className="p-4 border rounded-md bg-background">
+                      <h4 className="font-semibold mb-2">{dimensions[selectedDimension].fullName}</h4>
+                      <p className="mb-4">{dimensions[selectedDimension].insights[getDimensionLevel(dimensions[selectedDimension].value)]}</p>
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        <div className={cn("h-2 rounded-full bg-red-400", 
+                          getDimensionLevel(dimensions[selectedDimension].value) === 'low' ? "opacity-100" : "opacity-30"
+                        )} />
+                        <div className={cn("h-2 rounded-full bg-yellow-400", 
+                          getDimensionLevel(dimensions[selectedDimension].value) === 'medium' ? "opacity-100" : "opacity-30"
+                        )} />
+                        <div className={cn("h-2 rounded-full bg-green-400", 
+                          getDimensionLevel(dimensions[selectedDimension].value) === 'high' ? "opacity-100" : "opacity-30"
+                        )} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {dimensions.map((dim, index) => (
+                        <div 
+                          key={dim.dimension}
+                          className="p-4 border rounded-md bg-background cursor-pointer hover:border-primary transition-colors"
+                          onClick={() => setSelectedDimension(index)}
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-semibold">{dim.fullName}</h4>
+                            <span className={cn(
+                              "text-xs px-2 py-1 rounded-full",
+                              getDimensionLevel(dim.value) === 'low' ? "bg-red-100 text-red-800" :
+                              getDimensionLevel(dim.value) === 'medium' ? "bg-yellow-100 text-yellow-800" :
+                              "bg-green-100 text-green-800"
+                            )}>
+                              {getDimensionLevel(dim.value)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Click for insights</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {analysisTab === 'recommendations' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {selectedDimension !== null ? 
+                      `Recommendations for ${dimensions[selectedDimension].fullName}:` : 
+                      "Select a dimension by clicking on a slider to see specific recommendations."}
+                  </p>
+                  {selectedDimension !== null ? (
+                    <div className="p-4 border rounded-md bg-background">
+                      <h4 className="font-semibold mb-2">{dimensions[selectedDimension].fullName}</h4>
+                      <p>{dimensions[selectedDimension].recommendations[getDimensionLevel(dimensions[selectedDimension].value)]}</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {dimensions.map((dim, index) => (
+                        <div 
+                          key={dim.dimension}
+                          className="p-4 border rounded-md bg-background cursor-pointer hover:border-primary transition-colors"
+                          onClick={() => setSelectedDimension(index)}
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-semibold">{dim.fullName}</h4>
+                            <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <p className="text-sm text-muted-foreground">Click for recommendations</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {analysisTab === 'balance' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Analysis of how your dimensions work together and potential imbalances:
+                  </p>
+                  {dimensionalBalance.map((balance, idx) => (
+                    <div key={idx} className="p-4 border rounded-md bg-background">
+                      <h4 className="font-semibold mb-2">{balance.label}</h4>
+                      <p className="mb-2 text-muted-foreground">{balance.description}</p>
+                      <div className="pt-2 border-t">
+                        <h5 className="text-sm font-medium mb-1">Recommendation:</h5>
+                        <p className="text-sm">{balance.recommendations}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
